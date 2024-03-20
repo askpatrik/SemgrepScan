@@ -1,0 +1,30 @@
+on:
+ workflow_dispatch: {}
+ pull_request: {}
+ push:
+    branches:
+    - main
+    - master
+    paths:
+    - .github/workflows/semgrep.yml
+ schedule:
+    - cron: 42 7 * * *
+name: Semgrep
+jobs:
+ semgrep:
+    name: semgrep/ci
+    runs-on: ubuntu-20.04
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+    container:
+      image: returntocorp/semgrep
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run Semgrep and generate SARIF report
+      run: |
+        semgrep --sarif --output report.sarif --metrics=off --config="p/default"
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: report.sarif
+        category: my-analysis-tool
