@@ -10,6 +10,8 @@ on:
  schedule:
     - cron: 42 7 * * *
 name: Semgrep
+permissions:
+ security-events: write
 jobs:
  semgrep:
     name: semgrep/ci
@@ -24,7 +26,8 @@ jobs:
       run: |
         semgrep --sarif --output report.sarif --metrics=off --config="p/default"
     - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: report.sarif
         category: my-analysis-tool
+
